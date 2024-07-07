@@ -7,11 +7,12 @@ class Player(pygame.sprite.Sprite):
     class State(Enum):
         IDLE = 0
         WALK = 1
-        ATTACK = 2
+        CROUCH = 2
         JUMP = 3
-        FALL = 4
-        HURT = 5
-        DEAD = 6
+        ATTACK = 4
+        FALL = 5
+        HURT = 6
+        DEAD = 7
     
     class Input(Enum):
         MOVE_LEFT = pygame.K_a
@@ -73,15 +74,13 @@ class Player(pygame.sprite.Sprite):
         }
     
     def load_images(self):
-        self.images = self.spritesheet.load_all_images((0, 0, 64, 96), (0, 0), (192, 192), colorkey=(0, 0, 0))
+        self.images = self.spritesheet.load_all_images((0, 0, 64, 96), (0, 0), (304, 192), colorkey=(0, 0, 0))
         self.images = [pygame.transform.scale(image, (self.width, self.height)) for image in self.images]
 
         self.animations = {
             "IDLE": self.images[:3],
             "ATTACK": self.images[3:6],
-            "PUNCH_LEFT": self.images[6:9],
-            "KICK_RIGHT": self.images[9:12], 
-            "KICK_LEFT": self.images[12:15],
+            "CROUCH": self.images[7:8],
         }
         print(self.animations)
     
@@ -140,7 +139,7 @@ class Player(pygame.sprite.Sprite):
                 self.state = self.State.IDLE
         else:
             self.state = self.State.IDLE
-        print(self.state.name)
+        # print(self.state.name)
         # Animation
         self.frame_time -= dt
         if self.frame_time <= 0:

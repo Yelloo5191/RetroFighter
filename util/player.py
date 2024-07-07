@@ -14,14 +14,14 @@ class Player(pygame.sprite.Sprite):
         DEAD = 6
     
     class Input(Enum):
-        K_a = pygame.K_a
-        K_d = pygame.K_d
-        K_w = pygame.K_w
-        K_s = pygame.K_s
-        K_RIGHT = pygame.K_RIGHT
-        K_LEFT = pygame.K_LEFT
-        K_UP = pygame.K_UP
-        K_DOWN = pygame.K_DOWN
+        MOVE_LEFT = pygame.K_a
+        MOVE_RIGHT = pygame.K_d
+        JUMP = pygame.K_w
+        CROUCH = pygame.K_s
+        RIGHT = pygame.K_RIGHT
+        LEFT = pygame.K_LEFT
+        UP = pygame.K_UP
+        DOWN = pygame.K_DOWN
 
     def __init__(self, x, y, width, height, image):
         super().__init__()
@@ -39,6 +39,7 @@ class Player(pygame.sprite.Sprite):
         self.state = self.State.IDLE
 
         self.input_list = []
+        self.animation_in_progress = False
 
         self.attack_data = {
             "PUNCH_RIGHT": {
@@ -88,56 +89,58 @@ class Player(pygame.sprite.Sprite):
         keys = pygame.key.get_pressed()
         new_input = None
 
-        if keys[self.Input.K_a.value]:
-            new_input = self.Input.K_a.value
-        elif keys[self.Input.K_d.value]:
-            new_input = self.Input.K_d.value
-        elif keys[self.Input.K_w.value]:
-            new_input = self.Input.K_w.value
-        elif keys[self.Input.K_s.value]:
-            new_input = self.Input.K_s.value
-        elif keys[self.Input.K_RIGHT.value]:
-            new_input = self.Input.K_RIGHT.value
-        elif keys[self.Input.K_LEFT.value]:
-            new_input = self.Input.K_LEFT.value
-        elif keys[self.Input.K_UP.value]:
-            new_input = self.Input.K_UP.value
-        elif keys[self.Input.K_DOWN.value]:
-            new_input = self.Input.K_DOWN.value
+        if keys[self.Input.MOVE_LEFT.value]:
+            new_input = self.Input.MOVE_LEFT.value
+        elif keys[self.Input.MOVE_RIGHT.value]:
+            new_input = self.Input.MOVE_RIGHT.value
+        elif keys[self.Input.JUMP.value]:
+            new_input = self.Input.JUMP.value
+        elif keys[self.Input.CROUCH.value]:
+            new_input = self.Input.CROUCH.value
+        elif keys[self.Input.RIGHT.value]:
+            new_input = self.Input.RIGHT.value
+        elif keys[self.Input.LEFT.value]:
+            new_input = self.Input.LEFT.value
+        elif keys[self.Input.UP.value]:
+            new_input = self.Input.UP.value
+        elif keys[self.Input.DOWN.value]:
+            new_input = self.Input.DOWN.value
 
         if new_input and (not self.input_list or self.input_list[-1] != new_input):
             self.input_list.append(new_input)
+        else:
+            self.input_list.append("*")
 
         if self.input_list:
             current_input = self.input_list[-1]
 
-            if current_input == self.Input.K_a.value:
+            if current_input == self.Input.MOVE_LEFT.value:
                 self.rect.x -= self.speed * dt
                 self.state = self.State.WALK
-            elif current_input == self.Input.K_d.value:
+            elif current_input == self.Input.MOVE_RIGHT.value:
                 self.rect.x += self.speed * dt
                 self.state = self.State.WALK
-            elif current_input == self.Input.K_w.value:
+            elif current_input == self.Input.JUMP.value:
                 self.state = self.State.JUMP
-            elif current_input == self.Input.K_s.value:
+            elif current_input == self.Input.CROUCH.value:
                 self.state = self.State.CROUCH
-            elif current_input == self.Input.K_RIGHT.value:
+            elif current_input == self.Input.RIGHT.value:
                 self.state = self.State.ATTACK
                 self.attack("PUNCH_RIGHT")
-            elif current_input == self.Input.K_LEFT.value:
+            elif current_input == self.Input.LEFT.value:
                 self.state = self.State.ATTACK
                 self.attack("PUNCH_LEFT")
-            elif current_input == self.Input.K_UP.value:
+            elif current_input == self.Input.UP.value:
                 self.state = self.State.ATTACK
                 self.attack("KICK_RIGHT")
-            elif current_input == self.Input.K_DOWN.value:
+            elif current_input == self.Input.DOWN.value:
                 self.state = self.State.ATTACK
                 self.attack("KICK_LEFT")
             else:
                 self.state = self.State.IDLE
         else:
             self.state = self.State.IDLE
-
+        print(self.state.name)
         # Animation
         self.frame_time -= dt
         if self.frame_time <= 0:
@@ -147,13 +150,15 @@ class Player(pygame.sprite.Sprite):
                 self.frame = 0
                 if self.state.name in self.attack_data:
                     self.state = self.State.IDLE
+                    self.animation_in_progress = False
             else:
                 self.frame += 1
             self.image = animation[self.frame]
 
     def attack(self, attack_type):
         # Add logic for handling the attack
-        pass
+        self.animation_in_progress = True
+        # Add any additional logic required for attack
     
     def draw(self, screen):
         screen.blit(self.image, self.rect)

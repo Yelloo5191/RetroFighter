@@ -79,8 +79,8 @@ class Player(pygame.sprite.Sprite):
 
         self.animations = {
             "IDLE": self.images[:3],
-            "ATTACK": self.images[3:6],
-            "CROUCH": self.images[7:8],
+            "CROUCH": self.images[3:5],
+            "ATTACK": self.images[6:8],
         }
         print(self.animations)
     
@@ -146,10 +146,13 @@ class Player(pygame.sprite.Sprite):
             self.frame_time = 0.15
             animation = self.animations.get(self.state.name, self.animations["IDLE"])
             if self.frame + 1 >= len(animation):
-                self.frame = 0
                 if self.state.name in self.attack_data:
                     self.state = self.State.IDLE
                     self.animation_in_progress = False
+                if self.state == self.State.CROUCH:
+                    pass
+                else:
+                    self.frame = 0
             else:
                 self.frame += 1
             self.image = animation[self.frame]

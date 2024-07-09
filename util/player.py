@@ -43,7 +43,7 @@ class Player(pygame.sprite.Sprite):
         self.animation_in_progress = False
 
         self.attack_data = {
-            "PUNCH_RIGHT": {
+            "ATTACK": {
                 "damage": 10,
                 "range": 50,
                 "speed": 100,
@@ -113,40 +113,44 @@ class Player(pygame.sprite.Sprite):
         if self.input_list:
             current_input = self.input_list[-1]
 
-            if current_input == self.Input.MOVE_LEFT.value:
-                self.rect.x -= self.speed * dt
-                self.state = self.State.WALK
-            elif current_input == self.Input.MOVE_RIGHT.value:
-                self.rect.x += self.speed * dt
-                self.state = self.State.WALK
-            elif current_input == self.Input.JUMP.value:
-                self.state = self.State.JUMP
-            elif current_input == self.Input.CROUCH.value:
-                self.state = self.State.CROUCH
-            elif current_input == self.Input.RIGHT.value:
-                self.state = self.State.ATTACK
-                self.attack("PUNCH_RIGHT")
-            elif current_input == self.Input.LEFT.value:
-                self.state = self.State.ATTACK
-                self.attack("PUNCH_LEFT")
-            elif current_input == self.Input.UP.value:
-                self.state = self.State.ATTACK
-                self.attack("KICK_RIGHT")
-            elif current_input == self.Input.DOWN.value:
-                self.state = self.State.ATTACK
-                self.attack("KICK_LEFT")
-            else:
-                self.state = self.State.IDLE
+            if self.state.IDLE:
+                if current_input == self.Input.MOVE_LEFT.value:
+                    self.state = self.State.WALK
+                    self.rect.x -= self.speed * dt
+                elif current_input == self.Input.MOVE_RIGHT.value:
+                    self.state = self.State.WALK
+                    self.rect.x += self.speed * dt
+                elif current_input == self.Input.JUMP.value:
+                    self.state = self.State.JUMP
+                elif current_input == self.Input.CROUCH.value:
+                    self.state = self.State.CROUCH
+                elif current_input == self.Input.RIGHT.value:
+                    self.state = self.State.ATTACK
+                    self.attack("PUNCH_RIGHT")
+                elif current_input == self.Input.LEFT.value:
+                    self.state = self.State.ATTACK
+                    self.attack("PUNCH_LEFT")
+                elif current_input == self.Input.UP.value:
+                    self.state = self.State.ATTACK
+                    self.attack("KICK_RIGHT")
+                elif current_input == self.Input.DOWN.value:
+                    self.state = self.State.ATTACK
+                    self.attack("KICK_LEFT")
+           
         else:
             self.state = self.State.IDLE
-        # print(self.state.name)
+
+
+        print(self.state.name)
         # Animation
         self.frame_time -= dt
         if self.frame_time <= 0:
             self.frame_time = 0.15
             animation = self.animations.get(self.state.name, self.animations["IDLE"])
             if self.frame + 1 >= len(animation):
+                print("End of animation")
                 if self.state.name in self.attack_data:
+                    print("Attack over")
                     self.state = self.State.IDLE
                     self.animation_in_progress = False
                 if self.state == self.State.CROUCH:
@@ -155,6 +159,7 @@ class Player(pygame.sprite.Sprite):
                     self.frame = 0
             else:
                 self.frame += 1
+                print("next frame")
             self.image = animation[self.frame]
 
     def attack(self, attack_type):

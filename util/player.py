@@ -80,7 +80,7 @@ class Player(pygame.sprite.Sprite):
         self.animations = {
             "IDLE": self.images[:3],
             "CROUCH": self.images[3:5],
-            "ATTACK": self.images[6:8],
+            "ATTACK": self.images[5:7],
         }
         print(self.animations)
     

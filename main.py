@@ -50,7 +50,7 @@ def game():
     dt = 0
     prev_time = time.time()
 
-    player = Player(DISPLAY_SIZE[0] // 2, 80, 64, 96, "assets/player1/spritesheet.png", side="left", debug=True)
+    player = Player(DISPLAY_SIZE[0] // 2 - 132, 80, 64, 96, "assets/player1/spritesheet.png", side="left", debug=True)
     player2 = Player(DISPLAY_SIZE[0] // 2 + 100, 80, 64, 96, "assets/player1/spritesheet.png", side="right", debug=True)
 
     while True:

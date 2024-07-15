@@ -16,6 +16,10 @@ class Player(pygame.sprite.Sprite):
         RIGHT_PUNCH = 6
         LEFT_KICK = 7
         RIGHT_KICK = 8
+        LEFT_PUNCH_JUMP = 9
+        RIGHT_PUNCH_JUMP = 10
+        LEFT_JUMP_KICK = 11
+        RIGHT_JUMP_KICK = 12
 
     def __init__(self, x, y, width, height, image, side, debug=False):
         super().__init__()
@@ -65,6 +69,12 @@ class Player(pygame.sprite.Sprite):
             "CROUCH": self.images[3:5],
             "LEFT_PUNCH": self.images[5:7],
             "RIGHT_PUNCH": self.images[7:9],
+            "LEFT_KICK": self.images[9:11],
+            "RIGHT_KICK": self.images[11:13],
+            "LEFT_PUNCH_JUMP": self.images[13:15],
+            "RIGHT_PUNCH_JUMP": self.images[15:17],
+            "LEFT_JUMP_KICK": self.images[17:19],
+            "RIGHT_JUMP_KICK": self.images[19:21]
         }
         print(self.animations)
 
@@ -98,23 +108,7 @@ class Player(pygame.sprite.Sprite):
 
         if self.input_queue and self.current_input == self.input_queue[-1]:
             return
-
-        if self.current_input == self.Input.MOVE_LEFT:
-            self.collide_rect.x -= self.speed * dt
-            self.state = self.State.MOVE_BACKWARD
-        elif self.current_input == self.Input.MOVE_RIGHT:
-            self.collide_rect.x += self.speed * dt
-            self.state = self.State.MOVE_FORWARD
-        elif self.current_input == self.Input.JUMP and not self.is_jumping:
-            self.velocity_y = self.jump_speed
-            self.is_jumping = True
-            self.state = self.State.JUMP
-        elif self.current_input == self.Input.CROUCH:
-            self.state = self.State.CROUCH
-        elif self.current_input == self.Input.ATTACK_1:
-            self.attack("LEFT_PUNCH")
-        elif self.current_input == self.Input.ATTACK_2:
-            self.attack("RIGHT_PUNCH")
+        
         if self.is_jumping:
             self.velocity_y += self.gravity * dt
             self.collide_rect.y += self.velocity_y * dt
@@ -125,6 +119,27 @@ class Player(pygame.sprite.Sprite):
                 self.is_jumping = False
                 self.velocity_y = 0
                 print(self.collide_rect.y)
+            if self.current_input == self.Input.ATTACK_1:
+                self.attack("LEFT_PUNCH")
+        else:
+
+            if self.current_input == self.Input.MOVE_LEFT:
+                self.collide_rect.x -= self.speed * dt
+                self.state = self.State.MOVE_BACKWARD
+            elif self.current_input == self.Input.MOVE_RIGHT:
+                self.collide_rect.x += self.speed * dt
+                self.state = self.State.MOVE_FORWARD
+            elif self.current_input == self.Input.JUMP and not self.is_jumping:
+                self.velocity_y = self.jump_speed
+                self.is_jumping = True
+                self.state = self.State.JUMP
+            elif self.current_input == self.Input.CROUCH:
+                self.state = self.State.CROUCH
+            elif self.current_input == self.Input.ATTACK_1:
+                self.attack("LEFT_PUNCH")
+            elif self.current_input == self.Input.ATTACK_2:
+                self.attack("RIGHT_PUNCH")
+        
 
         if self.state_time <= 0:
             if self.current_input != self.Input.CROUCH:
@@ -136,12 +151,17 @@ class Player(pygame.sprite.Sprite):
         pass
 
     def attack(self, attack_type):
-        if attack_type == "LEFT_PUNCH":
-            self.state = self.State.LEFT_PUNCH
-            self.state_time = 0.3  # Duration of the punch animation
-        elif attack_type == "RIGHT_PUNCH":
-            self.state = self.State.RIGHT_PUNCH
-            self.state_time = 0.3  # Duration of the punch animation
+        if self.is_jumping:
+            if attack_type == "LEFT_PUNCH":
+                self.state = self.State.LEFT_PUNCH_JUMP
+                self.state_time = 0.3
+        else:
+            if attack_type == "LEFT_PUNCH":
+                self.state = self.State.LEFT_PUNCH
+                self.state_time = 0.3  # Duration of the punch animation
+            elif attack_type == "RIGHT_PUNCH":
+                self.state = self.State.RIGHT_PUNCH
+                self.state_time = 0.3  # Duration of the punch animation
 
     def animate(self, dt):
         if self.state == self.State.LEFT_PUNCH:

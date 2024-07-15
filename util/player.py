@@ -2,31 +2,29 @@ import pygame
 from util.spritesheet import spritesheet
 from enum import Enum
 
+from settings.config import DISPLAY_SIZE, Player_Input_1, Player_Input_2
+
 class Player(pygame.sprite.Sprite):
 
     class State(Enum):
         IDLE = 0
-        WALK = 1
-        CROUCH = 2
+        MOVE_FORWARD = 1
+        MOVE_BACKWARD = 2
         JUMP = 3
-        ATTACK = 4
-        FALL = 5
-        HURT = 6
-        DEAD = 7
-    
-    class Input(Enum):
-        MOVE_LEFT = pygame.K_a
-        MOVE_RIGHT = pygame.K_d
-        JUMP = pygame.K_w
-        CROUCH = pygame.K_s
-        RIGHT = pygame.K_RIGHT
-        LEFT = pygame.K_LEFT
-        UP = pygame.K_UP
-        DOWN = pygame.K_DOWN
+        CROUCH = 4
+        LEFT_PUNCH = 5
+        RIGHT_PUNCH = 6
+        LEFT_KICK = 7
+        RIGHT_KICK = 8
 
-    def __init__(self, x, y, width, height, image):
+    def __init__(self, x, y, width, height, image, side):
         super().__init__()
         self.spritesheet = spritesheet(image)
+        if side == "right":
+            self.spritesheet.flip()
+            self.spritesheet.hue_shift(180)
+        if side == "left":
+            self.spritesheet.hue_shift(40)
         self.image = self.spritesheet.image_at((0, 0, 64, 96), colorkey=(0, 0, 0))
         self.image = pygame.transform.scale(self.image, (width, height))
         self.rect = self.image.get_rect()
@@ -34,45 +32,27 @@ class Player(pygame.sprite.Sprite):
         self.width = width
         self.height = height
         self.speed = 250
+        self.jump_speed = -400
+        self.gravity = 1400
         self.load_images()
         self.frame = 0
         self.frame_time = 0.15
+        self.side = side
+
         self.state = self.State.IDLE
+        self.state_time = 0
+        self.input_queue = []
+        self.velocity_y = 0
+        self.is_jumping = False
 
-        self.input_list = []
-        self.animation_in_progress = False
+        self.setup_input()
 
-        self.attack_data = {
-            "ATTACK": {
-                "damage": 10,
-                "range": 50,
-                "speed": 100,
-                "cooldown": 0.5,
-                "duration": 0.2,
-            },
-            "PUNCH_LEFT": {
-                "damage": 10,
-                "range": 50,
-                "speed": 100,
-                "cooldown": 0.5,
-                "duration": 0.2,
-            },
-            "KICK_RIGHT": {
-                "damage": 15,
-                "range": 50,
-                "speed": 100,
-                "cooldown": 0.5,
-                "duration": 0.2,
-            },
-            "KICK_LEFT": {
-                "damage": 15,
-                "range": 50,
-                "speed": 100,
-                "cooldown": 0.5,
-                "duration": 0.2,
-            },
-        }
-    
+    def setup_input(self):
+        if self.side == "right":
+            self.Input = Player_Input_1
+        else:
+            self.Input = Player_Input_2
+
     def load_images(self):
         self.images = self.spritesheet.load_all_images((0, 0, 64, 96), (0, 0), (304, 192), colorkey=(0, 0, 0))
         self.images = [pygame.transform.scale(image, (self.width, self.height)) for image in self.images]
@@ -80,92 +60,99 @@ class Player(pygame.sprite.Sprite):
         self.animations = {
             "IDLE": self.images[:3],
             "CROUCH": self.images[3:5],
-            "ATTACK": self.images[5:7],
+            "LEFT_PUNCH": self.images[5:7],
+            "RIGHT_PUNCH": self.images[7:9],
         }
         print(self.animations)
-    
+
     def update(self, dt):
+        self.handle_input()
+        self.process_input(dt)
+        self.update_state(dt)
+        self.animate(dt)
+
+    def handle_input(self):
         keys = pygame.key.get_pressed()
-        new_input = None
+        self.current_input = None
 
         if keys[self.Input.MOVE_LEFT.value]:
-            new_input = self.Input.MOVE_LEFT.value
+            self.current_input = self.Input.MOVE_LEFT
         elif keys[self.Input.MOVE_RIGHT.value]:
-            new_input = self.Input.MOVE_RIGHT.value
+            self.current_input = self.Input.MOVE_RIGHT
         elif keys[self.Input.JUMP.value]:
-            new_input = self.Input.JUMP.value
+            self.current_input = self.Input.JUMP
         elif keys[self.Input.CROUCH.value]:
-            new_input = self.Input.CROUCH.value
-        elif keys[self.Input.RIGHT.value]:
-            new_input = self.Input.RIGHT.value
-        elif keys[self.Input.LEFT.value]:
-            new_input = self.Input.LEFT.value
-        elif keys[self.Input.UP.value]:
-            new_input = self.Input.UP.value
-        elif keys[self.Input.DOWN.value]:
-            new_input = self.Input.DOWN.value
+            self.current_input = self.Input.CROUCH
+        elif keys[self.Input.ATTACK_1.value]:
+            self.current_input = self.Input.ATTACK_1
+        elif keys[self.Input.ATTACK_2.value]:
+            self.current_input = self.Input.ATTACK_2
 
-        if new_input and (not self.input_list or self.input_list[-1] != new_input):
-            self.input_list.append(new_input)
-        else:
-            self.input_list.append("*")
+    def process_input(self, dt):
+        if self.state_time > 0:
+            self.state_time -= dt
+            return
 
-        if self.input_list:
-            current_input = self.input_list[-1]
+        if self.input_queue and self.current_input == self.input_queue[-1]:
+            return
 
-            if self.state.IDLE:
-                if current_input == self.Input.MOVE_LEFT.value:
-                    self.state = self.State.WALK
-                    self.rect.x -= self.speed * dt
-                elif current_input == self.Input.MOVE_RIGHT.value:
-                    self.state = self.State.WALK
-                    self.rect.x += self.speed * dt
-                elif current_input == self.Input.JUMP.value:
-                    self.state = self.State.JUMP
-                elif current_input == self.Input.CROUCH.value:
-                    self.state = self.State.CROUCH
-                elif current_input == self.Input.RIGHT.value:
-                    self.state = self.State.ATTACK
-                    self.attack("PUNCH_RIGHT")
-                elif current_input == self.Input.LEFT.value:
-                    self.state = self.State.ATTACK
-                    self.attack("PUNCH_LEFT")
-                elif current_input == self.Input.UP.value:
-                    self.state = self.State.ATTACK
-                    self.attack("KICK_RIGHT")
-                elif current_input == self.Input.DOWN.value:
-                    self.state = self.State.ATTACK
-                    self.attack("KICK_LEFT")
-           
-        else:
-            self.state = self.State.IDLE
+        if self.current_input == self.Input.MOVE_LEFT:
+            self.rect.x -= self.speed * dt
+            self.state = self.State.MOVE_BACKWARD
+        elif self.current_input == self.Input.MOVE_RIGHT:
+            self.rect.x += self.speed * dt
+            self.state = self.State.MOVE_FORWARD
+        elif self.current_input == self.Input.JUMP and not self.is_jumping:
+            self.velocity_y = self.jump_speed
+            self.is_jumping = True
+            self.state = self.State.JUMP
+        elif self.current_input == self.Input.CROUCH:
+            self.state = self.State.CROUCH
+        elif self.current_input == self.Input.ATTACK_1:
+            self.attack("LEFT_PUNCH")
+        elif self.current_input == self.Input.ATTACK_2:
+            self.attack("RIGHT_PUNCH")
+        if self.is_jumping:
+            self.velocity_y += self.gravity * dt
+            self.rect.y += self.velocity_y * dt
 
+            # Check if character has landed
+            if self.rect.bottom >= DISPLAY_SIZE[0] // 2:  # Assuming 500 is the ground level
+                self.rect.bottom = DISPLAY_SIZE[0] // 2
+                self.is_jumping = False
+                self.velocity_y = 0
 
-        print(self.state.name)
-        # Animation
-        self.frame_time -= dt
-        if self.frame_time <= 0:
-            self.frame_time = 0.15
-            animation = self.animations.get(self.state.name, self.animations["IDLE"])
-            if self.frame + 1 >= len(animation):
-                print("End of animation")
-                if self.state.name in self.attack_data:
-                    print("Attack over")
-                    self.state = self.State.IDLE
-                    self.animation_in_progress = False
-                if self.state == self.State.CROUCH:
-                    pass
-                else:
-                    self.frame = 0
-            else:
-                self.frame += 1
-                print("next frame")
-            self.image = animation[self.frame]
+        if self.state_time <= 0:
+            if self.current_input != self.Input.CROUCH:
+                self.state = self.State.IDLE
+
+    def update_state(self, dt):
+        pass
 
     def attack(self, attack_type):
-        # Add logic for handling the attack
-        self.animation_in_progress = True
-        # Add any additional logic required for attack
-    
+        if attack_type == "LEFT_PUNCH":
+            self.state = self.State.LEFT_PUNCH
+            self.state_time = 0.3  # Duration of the punch animation
+        elif attack_type == "RIGHT_PUNCH":
+            self.state = self.State.RIGHT_PUNCH
+            self.state_time = 0.3  # Duration of the punch animation
+
+    def animate(self, dt):
+        if self.state == self.State.LEFT_PUNCH:
+            self.image = self.animations["LEFT_PUNCH"][int(self.frame) % len(self.animations["LEFT_PUNCH"])]
+        elif self.state == self.State.RIGHT_PUNCH:
+            self.image = self.animations["RIGHT_PUNCH"][int(self.frame) % len(self.animations["RIGHT_PUNCH"])]
+        elif self.state == self.State.CROUCH:
+            if self.frame >= len(self.animations["CROUCH"]) - 1:
+                self.frame = len(self.animations["CROUCH"]) - 1
+            self.image = self.animations["CROUCH"][int(self.frame)]
+        else:
+            self.image = self.animations["IDLE"][int(self.frame) % len(self.animations["IDLE"])]
+        print(self.state)
+
+        self.frame += dt / self.frame_time
+        if self.frame >= len(self.animations[self.state.name]):
+            self.frame = 0
+
     def draw(self, screen):
         screen.blit(self.image, self.rect)

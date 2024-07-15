@@ -50,8 +50,8 @@ def game():
     dt = 0
     prev_time = time.time()
 
-    player = Player(DISPLAY_SIZE[0] // 2, DISPLAY_SIZE[1] - 75, 64, 96, "assets/player1/spritesheet.png")
-
+    player = Player(DISPLAY_SIZE[0] // 2, DISPLAY_SIZE[1] - 75, 64, 96, "assets/player1/spritesheet.png", side="left")
+    player2 = Player(DISPLAY_SIZE[0] // 2 + 100, DISPLAY_SIZE[1] - 75, 64, 96, "assets/player1/spritesheet.png", side="right")
 
     while True:
         clock.tick(FPS)
@@ -65,13 +65,15 @@ def game():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
-        
+
         player.update(dt)
         player.draw(display)
+        player2.update(dt)
+        player2.draw(display)
 
         screen.blit(pygame.transform.scale(display, RESOLUTION), (0, 0))
         pygame.display.flip()
-    
+
 if __name__ == "__main__":
     main_menu()
     pygame.quit()

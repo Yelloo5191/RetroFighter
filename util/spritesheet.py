@@ -14,13 +14,13 @@ class spritesheet(object):
         self.flipped = not self.flipped
 
     def hue_shift(self, shift):
-        for y in range(self.sheet.get_height()):
-            for x in range(self.sheet.get_width()):
+        for x in range(self.sheet.get_width()):
+            for y in range(self.sheet.get_height()):
                 color = self.sheet.get_at((x, y))
-                if color[0] != 0 and color[1] != 0 and color[2] != 0:
-                    r, g, b = colorsys.rgb_to_hsv(color[0] / 255, color[1] / 255, color[2] / 255)
-                    r, g, b = colorsys.hsv_to_rgb((r + shift) % 1, g, b)
-                    self.sheet.set_at((x, y), (int(r * 255), int(g * 255), int(b) * 255))
+                h, s, v = colorsys.rgb_to_hsv(color[0] / 255, color[1] / 255, color[2] / 255)
+                h = (h * 360 + shift) % 360
+                r, g, b = colorsys.hsv_to_rgb(h / 360, s, v)
+                self.sheet.set_at((x, y), (r * 255, g * 255, b * 255))
 
     # Load a specific image from a specific rectangle
     def image_at(self, rectangle, colorkey = None):

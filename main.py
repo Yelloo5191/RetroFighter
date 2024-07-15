@@ -50,8 +50,8 @@ def game():
     dt = 0
     prev_time = time.time()
 
-    player = Player(DISPLAY_SIZE[0] // 2, DISPLAY_SIZE[1] - 75, 64, 96, "assets/player1/spritesheet.png", side="left")
-    player2 = Player(DISPLAY_SIZE[0] // 2 + 100, DISPLAY_SIZE[1] - 75, 64, 96, "assets/player1/spritesheet.png", side="right")
+    player = Player(DISPLAY_SIZE[0] // 2, 80, 64, 96, "assets/player1/spritesheet.png", side="left", debug=True)
+    player2 = Player(DISPLAY_SIZE[0] // 2 + 100, 80, 64, 96, "assets/player1/spritesheet.png", side="right", debug=True)
 
     while True:
         clock.tick(FPS)

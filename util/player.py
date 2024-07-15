@@ -17,7 +17,7 @@ class Player(pygame.sprite.Sprite):
         LEFT_KICK = 7
         RIGHT_KICK = 8
 
-    def __init__(self, x, y, width, height, image, side):
+    def __init__(self, x, y, width, height, image, side, debug=False):
         super().__init__()
         self.spritesheet = spritesheet(image)
         if side == "right":
@@ -29,6 +29,7 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (width, height))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
+        self.collide_rect = pygame.Rect(x, y, width-32, height-16)
         self.width = width
         self.height = height
         self.speed = 250
@@ -44,6 +45,8 @@ class Player(pygame.sprite.Sprite):
         self.input_queue = []
         self.velocity_y = 0
         self.is_jumping = False
+
+        self.debug = debug
 
         self.setup_input()
 
@@ -97,10 +100,10 @@ class Player(pygame.sprite.Sprite):
             return
 
         if self.current_input == self.Input.MOVE_LEFT:
-            self.rect.x -= self.speed * dt
+            self.collide_rect.x -= self.speed * dt
             self.state = self.State.MOVE_BACKWARD
         elif self.current_input == self.Input.MOVE_RIGHT:
-            self.rect.x += self.speed * dt
+            self.collide_rect.x += self.speed * dt
             self.state = self.State.MOVE_FORWARD
         elif self.current_input == self.Input.JUMP and not self.is_jumping:
             self.velocity_y = self.jump_speed
@@ -114,17 +117,20 @@ class Player(pygame.sprite.Sprite):
             self.attack("RIGHT_PUNCH")
         if self.is_jumping:
             self.velocity_y += self.gravity * dt
-            self.rect.y += self.velocity_y * dt
+            self.collide_rect.y += self.velocity_y * dt
 
             # Check if character has landed
-            if self.rect.bottom >= DISPLAY_SIZE[0] // 2:  # Assuming 500 is the ground level
-                self.rect.bottom = DISPLAY_SIZE[0] // 2
+            if self.collide_rect.bottom >= DISPLAY_SIZE[0] // 2:  # Assuming 500 is the ground level
+                self.collide_rect.bottom = DISPLAY_SIZE[0] // 2
                 self.is_jumping = False
                 self.velocity_y = 0
+                print(self.collide_rect.y)
 
         if self.state_time <= 0:
             if self.current_input != self.Input.CROUCH:
                 self.state = self.State.IDLE
+
+        self.rect.center = self.collide_rect.center
 
     def update_state(self, dt):
         pass
@@ -148,7 +154,7 @@ class Player(pygame.sprite.Sprite):
             self.image = self.animations["CROUCH"][int(self.frame)]
         else:
             self.image = self.animations["IDLE"][int(self.frame) % len(self.animations["IDLE"])]
-        print(self.state)
+        # print(self.state)
 
         self.frame += dt / self.frame_time
         if self.frame >= len(self.animations[self.state.name]):
@@ -156,3 +162,6 @@ class Player(pygame.sprite.Sprite):
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
+        if self.debug:
+            # render self.rect
+            pygame.draw.rect(screen, (255, 0, 0), self.collide_rect, 2)

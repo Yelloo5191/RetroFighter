@@ -186,7 +186,6 @@ class Player(pygame.sprite.Sprite):
         elif self.state == self.State.LEFT_KICK:
             self.image = self.animations["LEFT_KICK"][int(self.frame) % len(self.animations["LEFT_KICK"])]
         elif self.state == self.State.RIGHT_KICK:
-            print(len(self.animations["RIGHT_KICK"]))
             self.image = self.animations["RIGHT_KICK"][int(self.frame) % len(self.animations["RIGHT_KICK"])]
         elif self.state == self.State.CROUCH:
             if self.frame >= len(self.animations["CROUCH"]) - 1:

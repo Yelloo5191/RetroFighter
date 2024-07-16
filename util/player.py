@@ -61,17 +61,17 @@ class Player(pygame.sprite.Sprite):
             self.Input = Player_Input_2
 
     def load_images(self):
-        self.images = self.spritesheet.load_all_images((0, 0, 64, 96), (0, 0), (304, 192), colorkey=(0, 0, 0))
+        self.images = self.spritesheet.load_all_images((0, 0, 64, 96), (0, 0), (384, 288), colorkey=(0, 0, 0))
         self.images = [pygame.transform.scale(image, (self.width, self.height)) for image in self.images]
 
         self.animations = {
             "IDLE": self.images[:3],
             "CROUCH": self.images[3:5],
-            "LEFT_PUNCH": self.images[5:7],
-            "RIGHT_PUNCH": self.images[7:9],
-            "LEFT_KICK": self.images[9:11],
-            "RIGHT_KICK": self.images[11:13],
-            "LEFT_PUNCH_JUMP": self.images[13:15],
+            "RIGHT_PUNCH": self.images[5:8],
+            "LEFT_PUNCH": self.images[8:11],
+            "LEFT_KICK": self.images[11:14],
+            "RIGHT_KICK": self.images[14:17],
+            "LEFT_PUNCH_JUMP": self.images[14:17],
             "RIGHT_PUNCH_JUMP": self.images[15:17],
             "LEFT_JUMP_KICK": self.images[17:19],
             "RIGHT_JUMP_KICK": self.images[19:21]
@@ -100,6 +100,10 @@ class Player(pygame.sprite.Sprite):
             self.current_input = self.Input.ATTACK_1
         elif keys[self.Input.ATTACK_2.value]:
             self.current_input = self.Input.ATTACK_2
+        elif keys[self.Input.ATTACK_3.value]:
+            self.current_input = self.Input.ATTACK_3
+        elif keys[self.Input.ATTACK_4.value]:
+            self.current_input = self.Input.ATTACK_4
 
     def process_input(self, dt):
         if self.state_time > 0:
@@ -139,6 +143,10 @@ class Player(pygame.sprite.Sprite):
                 self.attack("LEFT_PUNCH")
             elif self.current_input == self.Input.ATTACK_2:
                 self.attack("RIGHT_PUNCH")
+            elif self.current_input == self.Input.ATTACK_3:
+                self.attack("LEFT_KICK")
+            elif self.current_input == self.Input.ATTACK_4:
+                self.attack("RIGHT_KICK")
         
 
         if self.state_time <= 0:
@@ -162,12 +170,24 @@ class Player(pygame.sprite.Sprite):
             elif attack_type == "RIGHT_PUNCH":
                 self.state = self.State.RIGHT_PUNCH
                 self.state_time = 0.3  # Duration of the punch animation
+            elif attack_type == "LEFT_KICK":
+                self.state = self.State.LEFT_KICK
+                self.state_time = 0.3
+            elif attack_type == "RIGHT_KICK":
+                self.state = self.State.RIGHT_KICK
+                self.state_time = 0.3
+
 
     def animate(self, dt):
         if self.state == self.State.LEFT_PUNCH:
             self.image = self.animations["LEFT_PUNCH"][int(self.frame) % len(self.animations["LEFT_PUNCH"])]
         elif self.state == self.State.RIGHT_PUNCH:
             self.image = self.animations["RIGHT_PUNCH"][int(self.frame) % len(self.animations["RIGHT_PUNCH"])]
+        elif self.state == self.State.LEFT_KICK:
+            self.image = self.animations["LEFT_KICK"][int(self.frame) % len(self.animations["LEFT_KICK"])]
+        elif self.state == self.State.RIGHT_KICK:
+            print(len(self.animations["RIGHT_KICK"]))
+            self.image = self.animations["RIGHT_KICK"][int(self.frame) % len(self.animations["RIGHT_KICK"])]
         elif self.state == self.State.CROUCH:
             if self.frame >= len(self.animations["CROUCH"]) - 1:
                 self.frame = len(self.animations["CROUCH"]) - 1

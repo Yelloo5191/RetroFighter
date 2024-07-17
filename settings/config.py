@@ -23,5 +23,5 @@ class Player_Input_2(Enum):
     CROUCH = pygame.K_s
     ATTACK_1 = pygame.K_v
     ATTACK_2 = pygame.K_n
-    ATTACK_3 = pygame.K_b
-    ATTACK_4 = pygame.K_g
+    ATTACK_3 = pygame.K_g
+    ATTACK_4 = pygame.K_b

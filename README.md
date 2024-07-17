@@ -1,4 +1,4 @@
-RetroFigher based on Retro Tekken
+RetroFigher based on Retro Tekken but in a 2D Style
 
 Controls
 

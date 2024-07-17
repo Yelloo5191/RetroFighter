@@ -2,7 +2,7 @@ import pygame, time
 
 from util.player import Player
 from util.environment import Environment
-from util.ui import Button
+from util.ui import Button, HealthBar
 
 from settings.config import RESOLUTION, FPS, DISPLAY_SIZE
 
@@ -53,6 +53,9 @@ def game():
     player = Player(DISPLAY_SIZE[0] // 2 - 132, 80, 64, 96, "assets/player1/spritesheet.png", side="left", debug=True)
     player2 = Player(DISPLAY_SIZE[0] // 2 + 100, 80, 64, 96, "assets/player1/spritesheet.png", side="right", debug=True)
 
+    healthbar1 = HealthBar("left", 10, 10, 100, 10, 100)
+    healthbar2 = HealthBar("right", DISPLAY_SIZE[0] - 110, 10, 100, 10, 100)
+
     while True:
         clock.tick(FPS)
         environ.draw(display)
@@ -70,6 +73,9 @@ def game():
         player.draw(display)
         player2.update(dt)
         player2.draw(display)
+
+        healthbar1.draw(display)
+        healthbar2.draw(display)
 
         screen.blit(pygame.transform.scale(display, RESOLUTION), (0, 0))
         pygame.display.flip()

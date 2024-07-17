@@ -49,10 +49,13 @@ class Player(pygame.sprite.Sprite):
         self.input_queue = []
         self.velocity_y = 0
         self.is_jumping = False
+        self.cooldown = 0
 
         self.debug = debug
 
         self.setup_input()
+
+        
 
     def setup_input(self):
         if self.side == "right":
@@ -79,6 +82,10 @@ class Player(pygame.sprite.Sprite):
         print(self.animations)
 
     def update(self, dt):
+
+        if self.cooldown > 0:
+            self.cooldown -= dt
+
         self.handle_input()
         self.process_input(dt)
         self.update_state(dt)
@@ -126,27 +133,28 @@ class Player(pygame.sprite.Sprite):
             if self.current_input == self.Input.ATTACK_1:
                 self.attack("LEFT_PUNCH")
         else:
-
-            if self.current_input == self.Input.MOVE_LEFT:
-                self.collide_rect.x -= self.speed * dt
-                self.state = self.State.MOVE_BACKWARD
-            elif self.current_input == self.Input.MOVE_RIGHT:
-                self.collide_rect.x += self.speed * dt
-                self.state = self.State.MOVE_FORWARD
-            elif self.current_input == self.Input.JUMP and not self.is_jumping:
-                self.velocity_y = self.jump_speed
-                self.is_jumping = True
-                self.state = self.State.JUMP
-            elif self.current_input == self.Input.CROUCH:
-                self.state = self.State.CROUCH
-            elif self.current_input == self.Input.ATTACK_1:
-                self.attack("LEFT_PUNCH")
-            elif self.current_input == self.Input.ATTACK_2:
-                self.attack("RIGHT_PUNCH")
-            elif self.current_input == self.Input.ATTACK_3:
-                self.attack("LEFT_KICK")
-            elif self.current_input == self.Input.ATTACK_4:
-                self.attack("RIGHT_KICK")
+            if (self.state == self.State.IDLE or self.state == self.State.CROUCH or self.state == self.State.JUMP) and not self.cooldown > 0:
+                
+                if self.current_input == self.Input.MOVE_LEFT:
+                    self.collide_rect.x -= self.speed * dt
+                    self.state = self.State.MOVE_BACKWARD
+                elif self.current_input == self.Input.MOVE_RIGHT:
+                    self.collide_rect.x += self.speed * dt
+                    self.state = self.State.MOVE_FORWARD
+                elif self.current_input == self.Input.JUMP and not self.is_jumping:
+                    self.velocity_y = self.jump_speed
+                    self.is_jumping = True
+                    self.state = self.State.JUMP
+                elif self.current_input == self.Input.CROUCH:
+                    self.state = self.State.CROUCH
+                elif self.current_input == self.Input.ATTACK_1:
+                    self.attack("LEFT_PUNCH")
+                elif self.current_input == self.Input.ATTACK_2:
+                    self.attack("RIGHT_PUNCH")
+                elif self.current_input == self.Input.ATTACK_3:
+                    self.attack("LEFT_KICK")
+                elif self.current_input == self.Input.ATTACK_4:
+                    self.attack("RIGHT_KICK")
         
 
         if self.state_time <= 0:
@@ -167,15 +175,19 @@ class Player(pygame.sprite.Sprite):
             if attack_type == "LEFT_PUNCH":
                 self.state = self.State.LEFT_PUNCH
                 self.state_time = 0.3  # Duration of the punch animation
+                self.cooldown = 0.6
             elif attack_type == "RIGHT_PUNCH":
                 self.state = self.State.RIGHT_PUNCH
                 self.state_time = 0.3  # Duration of the punch animation
+                self.cooldown = 0.6
             elif attack_type == "LEFT_KICK":
                 self.state = self.State.LEFT_KICK
-                self.state_time = 0.3
+                self.state_time = 0.4
+                self.cooldown = 0.7
             elif attack_type == "RIGHT_KICK":
                 self.state = self.State.RIGHT_KICK
-                self.state_time = 0.3
+                self.state_time = 0.4
+                self.cooldown = 0.7
 
 
     def animate(self, dt):

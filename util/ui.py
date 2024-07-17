@@ -44,3 +44,22 @@ class Button():
     
     def click(self):
         self.action()
+
+class HealthBar():
+    def __init__(self, side, x, y, width, height, max_health):
+        self.side = side
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.max_health = max_health
+        self.health = max_health
+        self.color = (255, 0, 0)
+        self.background_color = (0, 0, 0)
+    
+    def draw(self, screen):
+        pygame.draw.rect(screen, self.background_color, (self.x, self.y, self.width, self.height))
+        pygame.draw.rect(screen, self.color, (self.x, self.y, self.width * (self.health / self.max_health), self.height))
+
+    def update(self, health):
+        self.health = health

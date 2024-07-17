@@ -1,1 +1,7 @@
-RetroFigher based on Retro Tekken 1
+RetroFigher based on Retro Tekken
+
+Controls
+
+Player 1:
+
+Player 2:

@@ -24,11 +24,14 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height, image, side, debug=False):
         super().__init__()
         self.spritesheet = spritesheet(image)
+        self.hitbox_offset = 0
         if side == "right":
             self.spritesheet.flip()
             self.spritesheet.hue_shift(180)
+            self.hitbox_offset = -1
         if side == "left":
             self.spritesheet.hue_shift(40)
+            self.hitbox_offset = 1
         self.image = self.spritesheet.image_at((0, 0, 64, 96), colorkey=(0, 0, 0))
         self.image = pygame.transform.scale(self.image, (width, height))
         self.rect = self.image.get_rect()
@@ -55,7 +58,16 @@ class Player(pygame.sprite.Sprite):
 
         self.setup_input()
 
-        
+        self.hitboxes = {
+            "LEFT_PUNCH": pygame.Rect(self.collide_rect.centerx + (self.hitbox_offset * 32), y + 16, 20, 20),
+            "RIGHT_PUNCH": pygame.Rect(0, 0, 0, 0),
+            "LEFT_KICK": pygame.Rect(0, 0, 0, 0),
+            "RIGHT_KICK": pygame.Rect(0, 0, 0, 0),
+            "LEFT_PUNCH_JUMP": pygame.Rect(0, 0, 0, 0),
+            "RIGHT_PUNCH_JUMP": pygame.Rect(0, 0, 0, 0),
+            "LEFT_JUMP_KICK": pygame.Rect(0, 0, 0, 0),
+            "RIGHT_JUMP_KICK": pygame.Rect(0, 0, 0, 0)
+        }
 
     def setup_input(self):
         if self.side == "right":
@@ -137,8 +149,12 @@ class Player(pygame.sprite.Sprite):
                 
                 if self.current_input == self.Input.MOVE_LEFT:
                     self.collide_rect.x -= self.speed * dt
+                    for hitbox in self.hitboxes.values():
+                        hitbox.x -= self.speed * dt
                     self.state = self.State.MOVE_BACKWARD
                 elif self.current_input == self.Input.MOVE_RIGHT:
+                    for hitbox in self.hitboxes.values():
+                        hitbox.x += self.speed * dt
                     self.collide_rect.x += self.speed * dt
                     self.state = self.State.MOVE_FORWARD
                 elif self.current_input == self.Input.JUMP and not self.is_jumping:
@@ -216,3 +232,6 @@ class Player(pygame.sprite.Sprite):
         if self.debug:
             # render self.rect
             pygame.draw.rect(screen, (255, 0, 0), self.collide_rect, 2)
+            # render hitboxes
+            for hitbox in self.hitboxes.values():
+                pygame.draw.rect(screen, (0, 255, 0), hitbox, 2)

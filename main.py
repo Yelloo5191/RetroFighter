@@ -53,6 +53,9 @@ def game():
     player = Player(DISPLAY_SIZE[0] // 2 - 132, 80, 64, 96, "assets/player1/spritesheet.png", side="left", debug=True)
     player2 = Player(DISPLAY_SIZE[0] // 2 + 100, 80, 64, 96, "assets/player1/spritesheet.png", side="right", debug=True)
 
+    player.set_enemy(player2)
+    player2.set_enemy(player)
+
     healthbar1 = HealthBar("left", 10, 10, 100, 10, 100)
     healthbar2 = HealthBar("right", DISPLAY_SIZE[0] - 110, 10, 100, 10, 100)
 

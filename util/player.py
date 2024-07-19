@@ -58,16 +58,18 @@ class Player(pygame.sprite.Sprite):
 
         self.setup_input()
 
-        self.hitboxes = {
-            "LEFT_PUNCH": pygame.Rect(self.collide_rect.centerx + (self.hitbox_offset * 32), y + 16, 20, 20),
-            "RIGHT_PUNCH": pygame.Rect(0, 0, 0, 0),
-            "LEFT_KICK": pygame.Rect(0, 0, 0, 0),
-            "RIGHT_KICK": pygame.Rect(0, 0, 0, 0),
-            "LEFT_PUNCH_JUMP": pygame.Rect(0, 0, 0, 0),
-            "RIGHT_PUNCH_JUMP": pygame.Rect(0, 0, 0, 0),
-            "LEFT_JUMP_KICK": pygame.Rect(0, 0, 0, 0),
-            "RIGHT_JUMP_KICK": pygame.Rect(0, 0, 0, 0)
+        hitbox_def = {
+            "LEFT_PUNCH": pygame.Rect(20, 30, 25, 20),
         }
+
+        self.hitboxes = {}
+
+        for name, hitbox in hitbox_def.items():
+            hitbox.center = (self.collide_rect.centerx + hitbox.x * self.hitbox_offset, self.collide_rect.centery - hitbox.y // 2)
+            self.hitboxes[name] = hitbox
+    
+    def set_enemy(self, enemy):
+        self.enemy = enemy
 
     def setup_input(self):
         if self.side == "right":
@@ -204,6 +206,11 @@ class Player(pygame.sprite.Sprite):
                 self.state = self.State.RIGHT_KICK
                 self.state_time = 0.4
                 self.cooldown = 0.7
+        
+        if self.hitboxes.get(attack_type):
+            # check if hitbox collides with enemy
+            if self.hitboxes[attack_type].colliderect(self.enemy.collide_rect):
+                print("HIT")
 
 
     def animate(self, dt):
@@ -233,5 +240,9 @@ class Player(pygame.sprite.Sprite):
             # render self.rect
             pygame.draw.rect(screen, (255, 0, 0), self.collide_rect, 2)
             # render hitboxes
-            for hitbox in self.hitboxes.values():
-                pygame.draw.rect(screen, (0, 255, 0), hitbox, 2)
+            for name, hitbox in self.hitboxes.items():
+                if self.state.name in name:
+                    pygame.draw.rect(screen, (0, 255, 0), hitbox, 2)
+        
+        # draw dot at center of collide_rect
+        pygame.draw.circle(screen, (255, 0, 0), self.collide_rect.center, 2)

@@ -62,6 +62,9 @@ class Player(pygame.sprite.Sprite):
 
         hitbox_def = {
             "LEFT_PUNCH": pygame.Rect(20, 30, 25, 20),
+            "RIGHT_PUNCH": pygame.Rect(25, 30, 25, 20),
+            "LEFT_KICK": pygame.Rect(20, 40, 30, 30),
+            "RIGHT_KICK": pygame.Rect(25, 0, 30, 30),
         }
 
         self.hitboxes = {}

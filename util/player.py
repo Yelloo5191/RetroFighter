@@ -20,6 +20,7 @@ class Player(pygame.sprite.Sprite):
         RIGHT_PUNCH_JUMP = 10
         LEFT_JUMP_KICK = 11
         RIGHT_JUMP_KICK = 12
+        HIT = 13
 
     def __init__(self, x, y, width, height, image, side, healthbar, debug=False):
         super().__init__()
@@ -79,7 +80,7 @@ class Player(pygame.sprite.Sprite):
             self.Input = Player_Input_2
 
     def load_images(self):
-        self.images = self.spritesheet.load_all_images((0, 0, 64, 96), (0, 0), (384, 288), colorkey=(0, 0, 0))
+        self.images = self.spritesheet.load_all_images((0, 0, 64, 96), (0, 0), (384, 384), colorkey=(0, 0, 0))
         self.images = [pygame.transform.scale(image, (self.width, self.height)) for image in self.images]
 
         self.animations = {
@@ -92,7 +93,8 @@ class Player(pygame.sprite.Sprite):
             "LEFT_PUNCH_JUMP": self.images[14:17],
             "RIGHT_PUNCH_JUMP": self.images[15:17],
             "LEFT_JUMP_KICK": self.images[17:19],
-            "RIGHT_JUMP_KICK": self.images[19:21]
+            "RIGHT_JUMP_KICK": self.images[19:21],
+            "HIT": self.images[17:21]
         }
         print(self.animations)
 
@@ -148,7 +150,7 @@ class Player(pygame.sprite.Sprite):
             if self.current_input == self.Input.ATTACK_1:
                 self.attack("LEFT_PUNCH")
         else:
-            if (self.state == self.State.IDLE or self.state == self.State.CROUCH or self.state == self.State.JUMP) and not self.cooldown > 0:
+            if (self.state == self.State.IDLE or self.state == self.State.CROUCH or self.state == self.State.JUMP) and not self.cooldown > 0 and not self.state == self.State.HIT:
                 
                 if self.current_input == self.Input.MOVE_LEFT:
                     self.collide_rect.x -= self.speed * dt
@@ -212,8 +214,13 @@ class Player(pygame.sprite.Sprite):
             # check if hitbox collides with enemy
             if self.hitboxes[attack_type].colliderect(self.enemy.collide_rect):
                 self.enemy.healthbar.decrease(10)
+                self.enemy.hit()
                 print("HIT")
 
+    def hit(self):
+        self.state = self.State.HIT
+        self.state_time = 0.5
+        self.cooldown = 0.5
 
     def animate(self, dt):
         if self.state == self.State.LEFT_PUNCH:
@@ -228,6 +235,8 @@ class Player(pygame.sprite.Sprite):
             if self.frame >= len(self.animations["CROUCH"]) - 1:
                 self.frame = len(self.animations["CROUCH"]) - 1
             self.image = self.animations["CROUCH"][int(self.frame)]
+        elif self.state == self.State.HIT:
+            self.image = self.animations["HIT"][int(self.frame) % len(self.animations["HIT"])]
         else:
             self.image = self.animations["IDLE"][int(self.frame) % len(self.animations["IDLE"])]
         # print(self.state)

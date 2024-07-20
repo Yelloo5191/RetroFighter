@@ -46,7 +46,7 @@ class Button():
         self.action()
 
 class HealthBar():
-    def __init__(self, side, x, y, width, height, max_health):
+    def __init__(self, side, x, y, width, height, max_health, flipped=False):
         self.side = side
         self.x = x
         self.y = y
@@ -56,12 +56,17 @@ class HealthBar():
         self.health = max_health
         self.color = (255, 0, 0)
         self.background_color = (0, 0, 0)
+        self.flipped = flipped
     
     def draw(self, screen):
         pygame.draw.rect(screen, self.background_color, (self.x, self.y, self.width, self.height))
-        pygame.draw.rect(screen, self.color, (self.x, self.y, self.width * (self.health / self.max_health), self.height))
+        health_width = self.width * (self.health / self.max_health)
+        if self.flipped:
+            pygame.draw.rect(screen, self.color, (self.x + self.width - health_width, self.y, health_width, self.height))
+        else:
+            pygame.draw.rect(screen, self.color, (self.x, self.y, health_width, self.height))
 
-    def update(self, health):
+    def update(self, health): 
         self.health = health
 
     def decrease(self, amount):

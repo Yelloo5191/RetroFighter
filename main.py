@@ -51,7 +51,7 @@ def game():
     prev_time = time.time()
     
     healthbar1 = HealthBar("left", 10, 10, 100, 10, 100)
-    healthbar2 = HealthBar("right", DISPLAY_SIZE[0] - 110, 10, 100, 10, 100)
+    healthbar2 = HealthBar("right", DISPLAY_SIZE[0] - 110, 10, 100, 10, 100, flipped=True)
 
     player = Player(DISPLAY_SIZE[0] // 2 - 132, 80, 64, 96, "assets/player1/spritesheet.png", healthbar=healthbar1, side="left", debug=True)
     player2 = Player(DISPLAY_SIZE[0] // 2 + 100, 80, 64, 96, "assets/player1/spritesheet.png", healthbar=healthbar2, side="right", debug=True)

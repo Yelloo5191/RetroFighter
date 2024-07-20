@@ -140,18 +140,19 @@ class Player(pygame.sprite.Sprite):
         if self.input_queue and self.current_input == self.input_queue[-1]:
             return
         
-        if self.is_jumping:
-            self.velocity_y += self.gravity * dt
-            self.collide_rect.y += self.velocity_y * dt
+        self.velocity_y += self.gravity * dt
+        self.collide_rect.y += self.velocity_y * dt
 
-            # Check if character has landed
-            if self.collide_rect.bottom >= DISPLAY_SIZE[0] // 2:  # Assuming 500 is the ground level
-                self.collide_rect.bottom = DISPLAY_SIZE[0] // 2
-                self.is_jumping = False
-                self.velocity_y = 0
-                print(self.collide_rect.y)
-            if self.current_input == self.Input.ATTACK_1:
-                self.attack("LEFT_PUNCH")
+        # Check if character has landed
+        if self.collide_rect.bottom >= DISPLAY_SIZE[0] // 2:  # Assuming 500 is the ground level
+            self.collide_rect.bottom = DISPLAY_SIZE[0] // 2
+            self.is_jumping = False
+            self.velocity_y = 0
+            print(self.collide_rect.y)
+        
+        if self.is_jumping:
+            # if self.current_input == self.Input.ATTACK_1:
+            #     self.attack("LEFT_PUNCH")
         else:
             if (self.state == self.State.IDLE or self.state == self.State.CROUCH or self.state == self.State.JUMP) and not self.cooldown > 0 and not self.state == self.State.HIT:
                 

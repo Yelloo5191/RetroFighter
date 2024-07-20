@@ -21,10 +21,11 @@ class Player(pygame.sprite.Sprite):
         LEFT_JUMP_KICK = 11
         RIGHT_JUMP_KICK = 12
 
-    def __init__(self, x, y, width, height, image, side, debug=False):
+    def __init__(self, x, y, width, height, image, side, healthbar, debug=False):
         super().__init__()
         self.spritesheet = spritesheet(image)
         self.hitbox_offset = 0
+        self.healthbar = healthbar
         if side == "right":
             self.spritesheet.flip()
             self.spritesheet.hue_shift(180)
@@ -210,6 +211,7 @@ class Player(pygame.sprite.Sprite):
         if self.hitboxes.get(attack_type):
             # check if hitbox collides with enemy
             if self.hitboxes[attack_type].colliderect(self.enemy.collide_rect):
+                self.enemy.healthbar.decrease(10)
                 print("HIT")
 
 

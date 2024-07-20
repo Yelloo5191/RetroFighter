@@ -63,3 +63,8 @@ class HealthBar():
 
     def update(self, health):
         self.health = health
+
+    def decrease(self, amount):
+        self.health -= amount
+        if self.health < 0:
+            self.health = 0

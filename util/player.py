@@ -27,6 +27,7 @@ class Player(pygame.sprite.Sprite):
         self.spritesheet = spritesheet(image)
         self.hitbox_offset = 0
         self.healthbar = healthbar
+        self.health = 100
         if side == "right":
             self.spritesheet.flip()
             self.spritesheet.hue_shift(180)
@@ -148,7 +149,7 @@ class Player(pygame.sprite.Sprite):
             self.collide_rect.bottom = DISPLAY_SIZE[0] // 2
             self.is_jumping = False
             self.velocity_y = 0
-            print(self.collide_rect.y)
+            # print(self.collide_rect.y)
         
         if self.is_jumping:
             # if self.current_input == self.Input.ATTACK_1:
@@ -226,6 +227,7 @@ class Player(pygame.sprite.Sprite):
         self.state = self.State.HIT
         self.state_time = 0.5
         self.cooldown = 0.5
+        self.health -= 10
 
     def animate(self, dt):
         if self.state == self.State.LEFT_PUNCH:

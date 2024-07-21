@@ -1,5 +1,6 @@
 import pygame
 from pygame import font
+from settings.config import DISPLAY_SIZE, RESOLUTION
 class Button():
     def __init__(self, x, y, width, height, text, action):
         self.x = x
@@ -74,19 +75,14 @@ class HealthBar():
             self.health = 0
 
 class WinText():
-    def __init__(self, x, y, width, height, winner):
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
-        self.text = f"{winner} WINS!"
-        self.font = font.Font(None, 16)
+    def __init__(self, winner):
+        self.x = RESOLUTION[0] // 2
+        self.y = RESOLUTION[1] // 2
+        self.font = font.Font('assets\\font\\tarrgetexpandital.ttf', 64)
+        self.text = self.font.render(f"player {winner} wins!", True, (255, 255, 255))
+        self.rect = self.text.get_rect(center=(self.x, self.y))
         self.color = (255, 255, 255)
-        self.rect = pygame.Rect(x, y, width, height)
-        self.rect.center = (x, y)
         self.winner = winner
     
     def draw(self, screen):
-        text = self.font.render(self.text, True, self.color)
-        text_rect = text.get_rect(center=self.rect.center)
-        screen.blit(text, text_rect)
+        screen.blit(self.text, self.rect)

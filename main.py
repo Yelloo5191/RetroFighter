@@ -2,7 +2,7 @@ import pygame, time
 
 from util.player import Player
 from util.environment import Environment
-from util.ui import Button, HealthBar
+from util.ui import Button, HealthBar, WinText
 
 from settings.config import RESOLUTION, FPS, DISPLAY_SIZE
 
@@ -57,10 +57,18 @@ def game():
     player.set_enemy(player2)
     player2.set_enemy(player)
 
+    won = False
+    winner = None
+
+    darken_layer = pygame.Surface(DISPLAY_SIZE)
 
     while True:
         clock.tick(FPS)
         environ.draw(display)
+
+        # darken
+        darken_layer.fill((0, 0, 0))
+        darken_layer.set_alpha(128)
 
         # compute delta time
         now = time.time()
@@ -71,15 +79,32 @@ def game():
             if event.type == pygame.QUIT:
                 return False
 
-        player.update(dt)
+        if player.health <= 0:
+            won = True
+            winner = 2
+            display.blit(darken_layer, (0, 0))
+        elif player2.health <= 0:
+            won = True
+            winner = 1
+            display.blit(darken_layer, (0, 0))
+            print("player 1 wins")
+        else:
+            player.update(dt)
+            player2.update(dt)
+
         player.draw(display)
-        player2.update(dt)
         player2.draw(display)
 
         healthbar1.draw(display)
         healthbar2.draw(display)
 
+        print(player.health, player2.health)
+
         screen.blit(pygame.transform.scale(display, RESOLUTION), (0, 0))
+        if won:
+            win_text = WinText(winner)
+            win_text.draw(screen)
+
         pygame.display.flip()
 
 if __name__ == "__main__":

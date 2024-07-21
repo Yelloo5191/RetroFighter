@@ -262,5 +262,5 @@ class Player(pygame.sprite.Sprite):
                 if self.state.name in name:
                     pygame.draw.rect(screen, (0, 255, 0), hitbox, 2)
         
-        # draw dot at center of collide_rect
-        pygame.draw.circle(screen, (255, 0, 0), self.collide_rect.center, 2)
+            # draw dot at center of collide_rect
+            pygame.draw.circle(screen, (255, 0, 0), self.collide_rect.center, 2)

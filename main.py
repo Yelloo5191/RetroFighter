@@ -17,8 +17,8 @@ environ = Environment(pygame.image.load("assets/environments/env1.png"), DISPLAY
 def main_menu():
     darken_layer = pygame.Surface(DISPLAY_SIZE)
 
-    start_button = Button(160, 90, 75, 25, "VS Battle", game)
-    quit_button = Button(170, 120, 75, 25, "Quit", pygame.quit)
+    start_button = Button(RESOLUTION[0] // 2, RESOLUTION[1] // 2, 300, 100, "vs battle", game)
+    quit_button = Button(RESOLUTION[0] // 2 - 50, RESOLUTION[1] // 2 + 150, 300, 100, "quit", pygame.quit)
 
     while True:
         clock.tick(FPS)
@@ -28,21 +28,19 @@ def main_menu():
         display.blit(darken_layer, (0, 0))
 
         mx, my = pygame.mouse.get_pos()
-        # normalize mouse position to display size
-        mx = mx * (DISPLAY_SIZE[0] / RESOLUTION[0])
-        my = my * (DISPLAY_SIZE[1] / RESOLUTION[1])
 
-        start_button.update((mx, my))
-        start_button.draw(display)
-
-        quit_button.update((mx, my))
-        quit_button.draw(display)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
 
         screen.blit(pygame.transform.scale(display, RESOLUTION), (0, 0))
+        
+        start_button.update((mx, my))
+        start_button.draw(screen)
+
+        quit_button.update((mx, my))
+        quit_button.draw(screen)
         pygame.display.flip()
 
 def game():

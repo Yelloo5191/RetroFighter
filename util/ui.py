@@ -1,6 +1,5 @@
 import pygame
 from pygame import font
-
 class Button():
     def __init__(self, x, y, width, height, text, action):
         self.x = x
@@ -11,7 +10,7 @@ class Button():
         self.rect.center = (x, y)
         self.text = text
         self.action = action
-        self.font = font.Font(None, 16)
+        self.font = font.Font('assets\\font\\tarrgetexpandital.ttf', 32)
         self.color = (255, 255, 255)
         self.highlighted = False
 
@@ -19,9 +18,9 @@ class Button():
         # Define the points for the slanted sides
         points = [
             (self.x - self.width // 2, self.y - self.height // 2),  # Top-left
-            (self.x + self.width // 2 - 10, self.y - self.height // 2),  # Top-right slanted inwards
+            (self.x + self.width // 2 + 40, self.y - self.height // 2),  # Top-right slanted inwards
             (self.x + self.width // 2, self.y + self.height // 2),  # Bottom-right
-            (self.x - self.width // 2 + 10, self.y + self.height // 2)  # Bottom-left slanted inwards
+            (self.x - self.width // 2 - 40, self.y + self.height // 2)  # Bottom-left slanted inwards
         ]
         
         if self.highlighted:
@@ -73,3 +72,21 @@ class HealthBar():
         self.health -= amount
         if self.health < 0:
             self.health = 0
+
+class WinText():
+    def __init__(self, x, y, width, height, winner):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.text = f"{winner} WINS!"
+        self.font = font.Font(None, 16)
+        self.color = (255, 255, 255)
+        self.rect = pygame.Rect(x, y, width, height)
+        self.rect.center = (x, y)
+        self.winner = winner
+    
+    def draw(self, screen):
+        text = self.font.render(self.text, True, self.color)
+        text_rect = text.get_rect(center=self.rect.center)
+        screen.blit(text, text_rect)

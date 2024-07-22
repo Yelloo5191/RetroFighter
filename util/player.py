@@ -2,7 +2,7 @@ import pygame
 from util.spritesheet import spritesheet
 from enum import Enum
 
-from settings.config import DISPLAY_SIZE, Player_Input_1, Player_Input_2
+from settings.config import DISPLAY_SIZE, Player_Input_1, Player_Input_2, PLAYER1_SHIFT, PLAYER2_SHIFT
 
 class Player(pygame.sprite.Sprite):
 
@@ -30,10 +30,10 @@ class Player(pygame.sprite.Sprite):
         self.health = 100
         if side == "right":
             self.spritesheet.flip()
-            self.spritesheet.hue_shift(180)
+            self.spritesheet.hue_shift(PLAYER1_SHIFT)
             self.hitbox_offset = -1
         if side == "left":
-            self.spritesheet.hue_shift(40)
+            self.spritesheet.hue_shift(PLAYER2_SHIFT)
             self.hitbox_offset = 1
         self.image = self.spritesheet.image_at((0, 0, 64, 96), colorkey=(0, 0, 0))
         self.image = pygame.transform.scale(self.image, (width, height))

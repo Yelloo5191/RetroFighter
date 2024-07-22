@@ -5,6 +5,9 @@ RESOLUTION = (1280, 720)
 DISPLAY_SIZE = (320, 180)
 FPS = 60
 
+PLAYER1_SHIFT = 180
+PLAYER2_SHIFT = 40
+
 class Player_Input_1(Enum):
     MOVE_LEFT = pygame.K_j
     MOVE_RIGHT = pygame.K_l

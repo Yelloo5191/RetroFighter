@@ -17,8 +17,9 @@ environ = Environment(pygame.image.load("assets/environments/env1.png"), DISPLAY
 def main_menu():
     darken_layer = pygame.Surface(DISPLAY_SIZE)
 
-    start_button = Button(RESOLUTION[0] // 2, RESOLUTION[1] // 2, 300, 100, "vs battle", game)
-    quit_button = Button(RESOLUTION[0] // 2 - 50, RESOLUTION[1] // 2 + 150, 300, 100, "quit", pygame.quit)
+    start_button = Button(RESOLUTION[0] - 200, RESOLUTION[1] // 2, 300, 100, "vs battle", game)
+    settings_button = Button(RESOLUTION[0] -250, RESOLUTION[1] // 2 + 150, 300, 100, "settings", settings)
+    quit_button = Button(RESOLUTION[0] - 300, RESOLUTION[1] // 2 + 300, 300, 100, "quit", pygame.quit)
 
     while True:
         clock.tick(FPS)
@@ -32,6 +33,7 @@ def main_menu():
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                pygame.quit()
                 return False
 
         screen.blit(pygame.transform.scale(display, RESOLUTION), (0, 0))
@@ -39,8 +41,80 @@ def main_menu():
         start_button.update((mx, my))
         start_button.draw(screen)
 
+        settings_button.update((mx, my))
+        settings_button.draw(screen)
+
         quit_button.update((mx, my))
         quit_button.draw(screen)
+        pygame.display.flip()
+
+def settings():
+
+    darken_layer = pygame.Surface(DISPLAY_SIZE)
+
+    back_button = Button(RESOLUTION[0] // 2, RESOLUTION[1] // 2 + 300, 300, 100, "back", main_menu)
+
+    edit_player_1 = Button(RESOLUTION[0] // 2 - 200, RESOLUTION[1] // 2, 300, 100, "player 1", edit_player, "player 1")
+    edit_player_2 = Button(RESOLUTION[0] // 2 + 200, RESOLUTION[1] // 2, 300, 100, "player 2", edit_player, "player 2")
+
+    while True:
+        clock.tick(FPS)
+        environ.draw(display)
+        darken_layer.fill((0, 0, 0))
+        darken_layer.set_alpha(128)
+        display.blit(darken_layer, (0, 0))
+
+        mx, my = pygame.mouse.get_pos()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return False
+
+        screen.blit(pygame.transform.scale(display, RESOLUTION), (0, 0))
+        
+        back_button.update((mx, my))
+        back_button.draw(screen)
+
+        edit_player_1.update((mx, my))
+        edit_player_1.draw(screen)
+
+        edit_player_2.update((mx, my))
+        edit_player_2.draw(screen)
+
+        pygame.display.flip()
+
+def edit_player(player):
+    
+    darken_layer = pygame.Surface(DISPLAY_SIZE)
+
+    back_button = Button(RESOLUTION[0] // 2, RESOLUTION[1] // 2 + 300, 300, 100, "back", settings)
+
+    text = "edit " + player
+    font = pygame.font.Font('assets\\font\\tarrgetexpandital.ttf', 64)
+    text = font.render(text, True, (255, 255, 255))
+
+    while True:
+        clock.tick(FPS)
+        environ.draw(display)
+        darken_layer.fill((0, 10, 0))
+        darken_layer.set_alpha(128)
+        display.blit(darken_layer, (0, 0))
+
+        mx, my = pygame.mouse.get_pos()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return False
+
+        screen.blit(pygame.transform.scale(display, RESOLUTION), (0, 0))
+
+        screen.blit(text, (RESOLUTION[0] // 2 - text.get_width() // 2, 50))
+        
+        back_button.update((mx, my))
+        back_button.draw(screen)
+
         pygame.display.flip()
 
 def game():
@@ -77,6 +151,7 @@ def game():
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                pygame.quit()
                 return False
 
         if player.health <= 0:

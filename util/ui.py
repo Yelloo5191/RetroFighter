@@ -2,7 +2,7 @@ import pygame
 from pygame import font
 from settings.config import DISPLAY_SIZE, RESOLUTION
 class Button():
-    def __init__(self, x, y, width, height, text, action):
+    def __init__(self, x, y, width, height, text, action, *args):
         self.x = x
         self.y = y
         self.width = width
@@ -14,6 +14,7 @@ class Button():
         self.font = font.Font('assets\\font\\tarrgetexpandital.ttf', 32)
         self.color = (255, 255, 255)
         self.highlighted = False
+        self.args = args
 
     def draw(self, screen):
         # Define the points for the slanted sides
@@ -43,7 +44,7 @@ class Button():
                 self.click()
     
     def click(self):
-        self.action()
+        self.action(*self.args)
 
 class HealthBar():
     def __init__(self, side, x, y, width, height, max_health, flipped=False):

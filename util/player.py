@@ -2,7 +2,7 @@ import pygame
 from util.spritesheet import spritesheet
 from enum import Enum
 
-from settings.config import DISPLAY_SIZE, Player_Input_1, Player_Input_2, PLAYER1_SHIFT, PLAYER2_SHIFT
+from settings.config import DISPLAY_SIZE, Player_Input_1, Player_Input_2, get_shift
 
 class Player(pygame.sprite.Sprite):
 
@@ -22,18 +22,22 @@ class Player(pygame.sprite.Sprite):
         RIGHT_JUMP_KICK = 12
         HIT = 13
 
-    def __init__(self, x, y, width, height, image, side, healthbar, debug=False):
+    def __init__(self, x, y, width, height, image, side, healthbar, debug=False, frozen=False):
         super().__init__()
         self.spritesheet = spritesheet(image)
+        self.spritesheet_original = image
         self.hitbox_offset = 0
         self.healthbar = healthbar
         self.health = 100
+        self.shift_value = 0
         if side == "right":
             self.spritesheet.flip()
-            self.spritesheet.hue_shift(PLAYER1_SHIFT)
+            self.shift_value = get_shift("player 1")
+            self.spritesheet.hue_shift(get_shift("player 1"))
             self.hitbox_offset = -1
         if side == "left":
-            self.spritesheet.hue_shift(PLAYER2_SHIFT)
+            self.shift_value = get_shift("player 2")
+            self.spritesheet.hue_shift(get_shift("player 2"))
             self.hitbox_offset = 1
         self.image = self.spritesheet.image_at((0, 0, 64, 96), colorkey=(0, 0, 0))
         self.image = pygame.transform.scale(self.image, (width, height))
@@ -57,6 +61,7 @@ class Player(pygame.sprite.Sprite):
         self.is_jumping = False
         self.cooldown = 0
 
+        self.frozen = frozen
         self.debug = debug
 
         self.setup_input()
@@ -100,17 +105,34 @@ class Player(pygame.sprite.Sprite):
             "RIGHT_JUMP_KICK": self.images[19:21],
             "HIT": self.images[17:21]
         }
-        print(self.animations)
+        # print(self.animations)
 
     def update(self, dt):
 
         if self.cooldown > 0:
             self.cooldown -= dt
 
+        self.animate(dt)
+        if self.frozen:
+            return
         self.handle_input()
         self.process_input(dt)
         self.update_state(dt)
-        self.animate(dt)
+    
+    def refresh_shift(self):
+        player1_shift = get_shift("player 1")
+        player2_shift = get_shift("player 2")
+        # print(player1_shift, self.shift_value)
+
+        if self.side == "right" and player1_shift != self.shift_value:
+            self.spritesheet = spritesheet(self.spritesheet_original)
+            self.spritesheet.flip()
+            self.spritesheet.hue_shift(player1_shift)
+            self.load_images()
+        if self.side == "left" and player2_shift != self.shift_value:
+            self.spritesheet = spritesheet(self.spritesheet_original)
+            self.spritesheet.hue_shift(player2_shift)
+            self.load_images()
 
     def handle_input(self):
         keys = pygame.key.get_pressed()

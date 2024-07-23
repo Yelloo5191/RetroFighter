@@ -5,8 +5,21 @@ RESOLUTION = (1280, 720)
 DISPLAY_SIZE = (320, 180)
 FPS = 60
 
-PLAYER1_SHIFT = 180
-PLAYER2_SHIFT = 40
+player1_shift = 180
+player2_shift = 40
+
+def update_shift(player, value):
+    global player1_shift, player2_shift
+    if player == "player 1" and value != player2_shift:
+        player1_shift = value
+    elif player == "player 2" and value != player1_shift:
+        player2_shift = value
+
+def get_shift(player):
+    if player == "player 1":
+        return player1_shift
+    elif player == "player 2":
+        return player2_shift
 
 class Player_Input_1(Enum):
     MOVE_LEFT = pygame.K_j

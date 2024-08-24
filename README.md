@@ -19,3 +19,6 @@ LEFT PUNCH `V`
 RIGHT PUNCH `N`
 LEFT KICK `G`
 RIGHT KICK `B`
+
+https://github.com/user-attachments/assets/072fce48-3031-4613-8144-77744283eecc
+

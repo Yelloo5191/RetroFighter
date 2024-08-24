@@ -1,3 +1,5 @@
+![Logo](https://github.com/Yelloo5191/RetroFighter/blob/master/fighter.png?raw=true)
+
 RetroFigher based on Retro Tekken but in a 2D Style
 
 Controls

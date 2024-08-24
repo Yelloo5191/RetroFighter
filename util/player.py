@@ -243,7 +243,7 @@ class Player(pygame.sprite.Sprite):
             if self.hitboxes[attack_type].colliderect(self.enemy.collide_rect):
                 self.enemy.healthbar.decrease(10)
                 self.enemy.hit()
-                print("HIT")
+                # print("HIT")
 
     def hit(self):
         self.state = self.State.HIT

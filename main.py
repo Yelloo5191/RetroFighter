@@ -103,7 +103,7 @@ def edit_player(player):
     slider_selected = False
 
     playerpreview = Player(DISPLAY_SIZE[0] // 2 - 132 if player == "player 2" else DISPLAY_SIZE[0] // 2 + 132, 80, 64, 96, "assets/player1/spritesheet.png", healthbar=None, side="left" if player == "player 2" else "right", frozen=True)
-    print('edit player')
+    # print('edit player')
 
     # get shift value
     shift_value = get_shift(player)
@@ -147,7 +147,7 @@ def edit_player(player):
             update_counter = 0
         playerpreview.update(0)
         playerpreview.draw(display)
-        print(update_counter)
+        # print(update_counter)
         update_counter += 1
             
         pygame.draw.rect(display, (255, 255, 255), shift_slider)
@@ -207,7 +207,7 @@ def game():
             won = True
             winner = 1
             display.blit(darken_layer, (0, 0))
-            print("player 1 wins")
+            # print("player 1 wins")
         else:
             player.update(dt)
             player2.update(dt)
@@ -218,7 +218,7 @@ def game():
         healthbar1.draw(display)
         healthbar2.draw(display)
 
-        print(player.health, player2.health)
+        # print(player.health, player2.health)
 
         screen.blit(pygame.transform.scale(display, RESOLUTION), (0, 0))
         if won:
